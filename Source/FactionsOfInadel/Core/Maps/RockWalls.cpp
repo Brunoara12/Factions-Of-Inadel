@@ -21,7 +21,7 @@ ARockWalls::ARockWalls()
 		//	TEXT("HierarchicalInstancedStaticMesh"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>FoundMesh(
-		TEXT("/Game/FoI/Maps/Assets/SM_TestCube_96x96.SM_TestCube_96x96"));
+		TEXT("/Game/FoI/Maps/Assets/SM_TestCube_100x100.SM_TestCube_100x100"));
 	if (FoundMesh.Succeeded())
 	{
 		HInstMesh->SetStaticMesh(FoundMesh.Object);
@@ -42,9 +42,9 @@ ARockWalls::ARockWalls()
 	HInstMesh->SetupAttachment(SceneComp);
 	BoxComp->SetupAttachment(SceneComp);
 
-	BoxComp->SetBoxExtent(FVector(48, 48, 2));
-	BoxComp->SetVisibility(true);
-	BoxComp->bHiddenInGame = false;
+	BoxComp->InitBoxExtent(FVector(50, 50, 1));
+	BoxComp->SetHiddenInGame(false);
+	
 }
 
 // Called when the game starts or when spawned

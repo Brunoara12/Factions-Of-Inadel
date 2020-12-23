@@ -19,6 +19,9 @@ public:
 
 
 	UMaterial* Material;
+	UMaterial* GrassMaterial;
+	UMaterial* AirMaterial;
+
 	UPROPERTY(EditAnywhere)
 		USceneComponent* SceneComp;
 
@@ -34,6 +37,9 @@ public:
 		UHierarchicalInstancedStaticMeshComponent* HInstMesh;
 	//UStaticMeshComponent* HInstMesh;
 
+	FVector CellCoord;
+	FVector SectorCoord;
+
 	bool bGridUsable;
 protected:
 	// Called when the game starts or when spawned
@@ -43,5 +49,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void SetCellCoord(FVector CellCoords, FVector SectorCoords);
 
+	void ChangeToGrassMaterial();
+
+	void ChangeToAir();
 };

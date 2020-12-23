@@ -21,7 +21,7 @@ AGridBase::AGridBase()
 	//	TEXT("HierarchicalInstancedStaticMesh"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>FoundMesh(
-		TEXT("/Game/FoI/Maps/Assets/SM_GridBase_96x96.SM_GridBase_96x96"));
+		TEXT("/Game/FoI/Maps/Assets/SM_GridBase_100x100.SM_GridBase_100x100"));
 	if (FoundMesh.Succeeded())
 	{
 		HInstMesh->SetStaticMesh(FoundMesh.Object);
@@ -29,11 +29,21 @@ AGridBase::AGridBase()
 
 	static ConstructorHelpers::FObjectFinder<UMaterial>FoundMaterial(
 		TEXT("/Game/FoI/Maps/Assets/M_GridBase.M_GridBase"));
+	static ConstructorHelpers::FObjectFinder<UMaterial>FoundGrassMaterial(
+		TEXT("/Game/FoI/Maps/Assets/M_Grass.M_Grass"));
+	static ConstructorHelpers::FObjectFinder<UMaterial>FoundAirMaterial(
+		TEXT("/Game/FoI/Maps/Assets/M_Transparent.M_Transparent"));
 	if (FoundMaterial.Succeeded())
 	{
 		Material = FoundMaterial.Object;
-		//Material->bUsedWithInstancedStaticMeshes = true;
-		//V_LOG("Worked");
+	}
+	if (FoundGrassMaterial.Succeeded())
+	{
+		GrassMaterial = FoundGrassMaterial.Object;
+	}
+	if (FoundGrassMaterial.Succeeded())
+	{
+		AirMaterial= FoundAirMaterial.Object;
 	}
 
 	this->GridMeshMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
@@ -44,10 +54,9 @@ AGridBase::AGridBase()
 	HInstMesh->SetupAttachment(SceneComp);
 	BoxComp->SetupAttachment(SceneComp);
 
-	BoxComp->SetBoxExtent(FVector(48, 48, 2));
-	BoxComp->SetVisibility(true);
-	BoxComp->bHiddenInGame = false;
-
+	BoxComp->InitBoxExtent(FVector(50, 50, 1));
+	
+	BoxComp->SetHiddenInGame(false);
 }
 
 // Called when the game starts or when spawned
@@ -67,5 +76,23 @@ void AGridBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AGridBase::SetCellCoord(FVector CellCoords, FVector SectorCoords)
+{
+	CellCoord = CellCoords;
+	SectorCoord = SectorCoords;
+}
+
+void AGridBase::ChangeToGrassMaterial()
+{
+	this->GridMeshMaterial = UMaterialInstanceDynamic::Create(GrassMaterial, NULL);
+	this->HInstMesh->SetMaterial(0, GridMeshMaterial);
+}
+
+void AGridBase::ChangeToAir()
+{
+	this->GridMeshMaterial = UMaterialInstanceDynamic::Create(AirMaterial, NULL);
+	this->HInstMesh->SetMaterial(0, GridMeshMaterial);
 }
 
