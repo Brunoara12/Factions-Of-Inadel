@@ -40,6 +40,11 @@ void AFactionsOfInadelPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AFactionsOfInadelPlayerController::OnResetVR);
 
+	// Player Movement Keybind
+	InputComponent->BindAction("Right", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveRight);
+	InputComponent->BindAction("Left", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveLeft);
+	InputComponent->BindAction("Forward", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveForward);
+	InputComponent->BindAction("Back", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveBack);
 
 	// Toggle Between Edit Mode and Play Mode
 	InputComponent->BindAction("EditWorld", IE_Pressed, this, &AFactionsOfInadelPlayerController::OnEditMode);
@@ -103,7 +108,7 @@ void AFactionsOfInadelPlayerController::SetNewMoveDestination(const FVector Dest
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 120.0f))
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetActorLocation() + DestLocation);
 		}
 	}
 }
@@ -303,18 +308,22 @@ void AFactionsOfInadelPlayerController::OnEditMode()
 
 void AFactionsOfInadelPlayerController::MoveLeft()
 {
+	SetNewMoveDestination(FVector(-100, 0, 0));
 }
 
 void AFactionsOfInadelPlayerController::MoveRight()
 {
+	SetNewMoveDestination(FVector(100, 0, 0));
 }
 
 void AFactionsOfInadelPlayerController::MoveForward()
 {
+	SetNewMoveDestination(FVector(0, -100, 0));
 }
 
 void AFactionsOfInadelPlayerController::MoveBack()
 {
+	SetNewMoveDestination(FVector(0, 100, 0));
 }
 
 bool AFactionsOfInadelPlayerController::SaveGameDataToFile(const FString& FullFilePath, FBufferArchive& ToBinary, FMapSector& MapSector, FVector& SectorCoord)
@@ -417,6 +426,13 @@ void AFactionsOfInadelPlayerController::BeginPlay()
 	{
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(World, AGridSectorSetup::StaticClass(), FoundActors);
-		SectorSetup = Cast<AGridSectorSetup>(FoundActors[0]);
+		if (FoundActors[0])
+		{
+			SectorSetup = Cast<AGridSectorSetup>(FoundActors[0]);
+		}
+		else
+		{
+			V_LOG("Not Found");
+		}
 	}
 }

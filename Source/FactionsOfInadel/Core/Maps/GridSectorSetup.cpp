@@ -49,6 +49,7 @@ void AGridSectorSetup::BeginPlay()
 				PC->LoadGameDataFromFile(SaveFile, WorldSectors.GetZ(SectorCoord.Z).GetX(SectorCoord.X).GetY(SectorCoord.Y)->MapSector, 
 					WorldSectors.GetZ(0).GetX(0).GetY(0)->SectorLocation);
 				
+				// DELETE{
 				SpawnSectorGrid(FVector());
 
 				// Spawns all Cells in sector
