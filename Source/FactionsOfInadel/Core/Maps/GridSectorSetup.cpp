@@ -23,7 +23,7 @@ void AGridSectorSetup::SpawnSectorGrid(FVector SectorCoord)
 
 void AGridSectorSetup::BeginPlay()
 {
-	FString Directory = "C:\\Users\\Bruno\\UnrealProjects_4_26\\FactionsOfInadel\\MapData";
+	FString Directory = FPaths::ProjectDir() + "MapData";
 	UWorld* World = GetWorld();
 	AFactionsOfInadelPlayerController* PC = NULL;
 	if (World)
@@ -31,24 +31,32 @@ void AGridSectorSetup::BeginPlay()
 		PC = Cast<AFactionsOfInadelPlayerController>(World->GetFirstPlayerController());
 		FString SaveFile;
 		FVector SectorCoord;
+		AGridSetup* SpawnedActor;
 		if (FPaths::DirectoryExists(Directory))
 		{
 			// Set to -4 , 4 for the time being. total of 9x9x9 - 729 Sectors
 			WorldSectors = FWorldSectors();
 			FString Ext = "save";
+			FString FileName = "";
 			FFileManagerGeneric::Get().FindFiles(ArrayOfSavedSectors, *Directory, *Ext);
 			// TODO Load ALL save sector data
 			for (int i = 0; i < ArrayOfSavedSectors.Num(); i++)
 			{
 				SaveFile = Directory + "\\" + ArrayOfSavedSectors[i];
 
-				// Spawn Sector Grid into World Sector
-				WorldSectors.GetZ(SectorCoord.Z).GetX(SectorCoord.X).GetY(SectorCoord.Y) = World->SpawnActor<AGridSetup>(AGridSetup::StaticClass(), FTransform());
+				//FPaths::Split(SaveFile, Directory, FileName, Ext);
+
+				SpawnedActor = World->SpawnActor<AGridSetup>(AGridSetup::StaticClass(), FTransform());
 
 				// Load Sector Data from SaveFile into WorldSector
-				PC->LoadGameDataFromFile(SaveFile, WorldSectors.GetZ(SectorCoord.Z).GetX(SectorCoord.X).GetY(SectorCoord.Y)->MapSector, 
-					WorldSectors.GetZ(0).GetX(0).GetY(0)->SectorLocation);
+				PC->LoadGameDataFromFile(SaveFile, SpawnedActor->MapSector, SectorCoord);
 				
+
+
+				// Spawn Sector Grid into World Sector
+				WorldSectors.GetZ(SectorCoord.Z).GetX(SectorCoord.X).GetY(SectorCoord.Y) = SpawnedActor;
+
+
 				// DELETE{
 				SpawnSectorGrid(FVector());
 

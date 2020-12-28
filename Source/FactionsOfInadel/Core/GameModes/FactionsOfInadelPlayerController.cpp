@@ -7,6 +7,7 @@
 #include "../MainCharacter/FactionsOfInadelCharacter.h"
 #include "../HelperFiles/DefinedDebugHelpers.h"
 
+#include "AIController.h"
 #include "Engine/World.h"
 
 AFactionsOfInadelPlayerController::AFactionsOfInadelPlayerController()
@@ -103,12 +104,18 @@ void AFactionsOfInadelPlayerController::SetNewMoveDestination(const FVector Dest
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
+		V_LOGM("Dest Location: %s", *DestLocation.ToString());
+		V_LOGM("Current Location: %s", *MyPawn->GetActorLocation().ToString());
+
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
+		V_LOGM("%f", Distance);
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 120.0f))
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetActorLocation() + DestLocation);
+			AAIController* AICtr = Cast<AAIController>(this);
+			AICtr->MoveToLocation(MyPawn->GetActorLocation() + DestLocation);
+			//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetActorLocation() + DestLocation);
 		}
 	}
 }
