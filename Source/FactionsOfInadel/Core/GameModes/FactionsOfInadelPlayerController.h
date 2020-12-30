@@ -91,6 +91,8 @@ protected:
 	//FArchive is shared base class for FBufferArchive and FMemoryReader
 	void SaveLoadData(FArchive& Ar, FMapSector& MapSector, FVector& SectorCoord);
 
+	
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

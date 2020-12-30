@@ -9,6 +9,6 @@ public class FactionsOfInadel : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem" });
-		PublicDependencyModuleNames.AddRange(new string[] { "AIModule" });
+		PublicDependencyModuleNames.AddRange(new string[] { "AIModule", "UMG", "Slate", "SlateCore"});
 	}
 }

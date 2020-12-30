@@ -14,6 +14,8 @@ AFactionsOfInadelPlayerController::AFactionsOfInadelPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
+	
 }
 
 void AFactionsOfInadelPlayerController::PlayerTick(float DeltaTime)
@@ -42,7 +44,6 @@ void AFactionsOfInadelPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AFactionsOfInadelPlayerController::OnResetVR);
 
 	// Player Movement Keybind
-	InputComponent->BindAction("Right", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveRight);
 	InputComponent->BindAction("Left", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveLeft);
 	InputComponent->BindAction("Forward", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveForward);
 	InputComponent->BindAction("Back", IE_Pressed, this, &AFactionsOfInadelPlayerController::MoveBack);
@@ -113,8 +114,27 @@ void AFactionsOfInadelPlayerController::SetNewMoveDestination(const FVector Dest
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 120.0f))
 		{
-			AAIController* AICtr = Cast<AAIController>(this);
-			AICtr->MoveToLocation(MyPawn->GetActorLocation() + DestLocation);
+			AController* TEMP = MyPawn->GetController();
+			if (TEMP)
+			{
+
+			}
+			else
+			{
+				V_LOG("NO TEMP");
+			}
+			AAIController* AICtr = Cast<AAIController>(TEMP);
+			if (AICtr)
+			{
+				AICtr->MoveToLocation(MyPawn->GetActorLocation() + DestLocation);
+			}
+			else
+			{
+			}
+			MyPawn->SetActorLocation(MyPawn->GetActorLocation() + DestLocation);
+			//MyPawn->SetVelo
+			V_LOGM("%f: %s", DestLocation.Size() * 100, *DestLocation.GetSafeNormal().ToString());
+
 			//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetActorLocation() + DestLocation);
 		}
 	}

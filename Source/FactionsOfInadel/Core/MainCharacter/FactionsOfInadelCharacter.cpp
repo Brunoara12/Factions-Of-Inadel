@@ -12,6 +12,11 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
+#include "../HelperFiles/DefinedDebugHelpers.h"
+
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 AFactionsOfInadelCharacter::AFactionsOfInadelCharacter()
 {
 	// Set size for player capsule
@@ -52,14 +57,22 @@ AFactionsOfInadelCharacter::AFactionsOfInadelCharacter()
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
+
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	//CurrentSpeed = 600;
+	bReadyState = true;
+	bMoving = false;
 }
 
 void AFactionsOfInadelCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	MyTimeline.TickTimeline(DeltaSeconds);
 
 	if (CursorToWorld != nullptr)
 	{
@@ -87,4 +100,76 @@ void AFactionsOfInadelCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+
+	InfoWidget->GetWidgetFromName("RightHelp")->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AFactionsOfInadelCharacter::BeginMove()
+{
+	TimelineValue = MyTimeline.GetPlaybackPosition();
+	CurveFloatValue = MoveValue * SpeedCurve->GetFloatValue(TimelineValue);
+
+	 //NewLocation = FVector(GetActorLocation().X + CurveFloatValue, GetActorLocation().Y, GetActorLocation().Z);
+	FVector NewLocation = FMath::Lerp(TempCurrentLocation, TargetLocation, CurveFloatValue);
+	V_LOGM("location: %s", *NewLocation.ToString());
+
+	SetActorLocation(NewLocation);
+
+}
+
+void AFactionsOfInadelCharacter::FinishedMove()
+{
+	bReadyState = true;
+	bMoving = false;
+}
+
+void AFactionsOfInadelCharacter::InitiateMove()
+{
+	if (bReadyState)
+	{
+		TempCurrentLocation = GetActorLocation();
+		TargetLocation = FVector(GetActorLocation().X + 100, GetActorLocation().Y, GetActorLocation().Z);
+		MyTimeline.PlayFromStart();
+
+	}
+}
+
+void AFactionsOfInadelCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	MoveValue = 1.f;
+
+	if (SpeedCurve)
+	{
+		FOnTimelineFloat TimelineCallback;
+		FOnTimelineEventStatic TimelineFinishedCallback;
+
+		TimelineCallback.BindUFunction(this, FName("BeginMove"));
+		TimelineFinishedCallback.BindUFunction(this, FName("FinishedMove"));
+
+		MyTimeline.AddInterpFloat(SpeedCurve, TimelineCallback);
+		MyTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
+		MyTimeline.SetPlayRate(5);
+		V_LOGF("",MyTimeline.GetPlayRate());
+	}
+
+	if (HelpWidgetClass)
+	{
+		InfoWidget = CreateWidget<UUserWidget>(GetWorld(), HelpWidgetClass);
+
+		if (InfoWidget)
+		{
+			InfoWidget->AddToViewport();
+		}
+	}
+}
+
+void AFactionsOfInadelCharacter::SetupPlayerInputComponent(class UInputComponent* inputComponent)
+{
+	check(inputComponent);
+
+	// Player Movement Keybind
+	inputComponent->BindAction("Right", IE_Pressed, this, &AFactionsOfInadelCharacter::InitiateMove);
+
 }
