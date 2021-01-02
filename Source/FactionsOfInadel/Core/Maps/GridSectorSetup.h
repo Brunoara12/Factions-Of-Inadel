@@ -66,7 +66,7 @@ struct FWorldSectorsX {
 
 	FWorldSectorsY& GetX(int32 i)
 	{
- 		return SectorsX[i = OFFSET];
+ 		return SectorsX[i + OFFSET];
 	}
 
 	void AddNewSectorY()
@@ -86,7 +86,8 @@ struct FWorldSectors {
 
 		UPROPERTY()
 		TArray<FWorldSectorsX> SectorsZ;
-		
+
+	int32 SectorDimension;
 	int8 OFFSET = 4;
 
 	FWorldSectorsX& GetZ(int32 i)
@@ -169,9 +170,16 @@ struct FWorldSectors {
 		SectorsZ.Empty();
 	}
 
-	FWorldSectors() 
+	// ex. SectorDimension = 9 then it's 9x9x9 = 729 Sector in World
+	FWorldSectors(int32 SectorDimension) 
 	{
-		AddUnitialized(9, 9, 9);
+		AddUnitialized(SectorDimension, SectorDimension, SectorDimension);
+		this->SectorDimension = SectorDimension;
+	}
+
+	FWorldSectors()
+	{
+
 	}
 };
 
@@ -190,7 +198,6 @@ public:
 	AGridSectorSetup();
 
 
-	void SpawnSectorGrid(FVector SectorCoord);
 
 	FWorldSectors WorldSectors;
 

@@ -252,31 +252,61 @@ void AFactionsOfInadelPlayerController::OnSaveMapData()
 {
 	if (bInEditMode)
 	{
-		FBufferArchive ToBinary;
-
+		FString Directory = FPaths::ProjectDir() + "MapData\\";
 		
+		int32 SecDimension = SectorSetup->WorldSectors.SectorDimension;
+		int8 SecOffset = SectorSetup->WorldSectors.OFFSET;
+		AGridSetup* GridSetup;
+		FMapSector CurrentMapSector;
+		FVector SectorCoord;
 
-		// TODO Create Save for all Sectors
-		AGridSetup* GridSetup = SectorSetup->WorldSectors.GetZ(0).GetX(0).GetY(0); // Sector 0,0,0 for now
-		FMapSector CurrentMapSector = GridSetup->MapSector;
-		
-
-		FVector SectorCoord = GridSetup->SectorLocation;
-		
-
-		bool SaveSuccess = SaveGameDataToFile("C:\\Users\\Bruno\\UnrealProjects_4_26\\FactionsOfInadel\\MapData\\" + SectorCoord.ToCompactString() + ".save", 
-			ToBinary, 
-			CurrentMapSector, 
-			SectorCoord);
-
-		if (SaveSuccess)
+		for (int32 z = -(SecOffset); z < (SecDimension - SecOffset); z++)
 		{
-			SCREENMSG("Save Successful!");
+			for (int32 x = -(SecOffset); x < (SecDimension - SecOffset); x++)
+			{
+				for (int32 y = -(SecOffset); y < (SecDimension - SecOffset); y++)
+				{
+
+					if (SectorSetup->WorldSectors.GetZ(z).GetX(x).GetY(y) != NULL)
+					{
+						FBufferArchive ToBinary;
+
+						// Sector Exists
+						FVector Temp = FVector(x, y, z);
+						V_LOGM("SECTOR: %s", *Temp.ToString());
+
+						// Grabs Sector Class Z, X, Y from World Sector
+						GridSetup = SectorSetup->WorldSectors.GetZ(z).GetX(x).GetY(y); 
+
+						// Assigns Local Reference to Sector and Sector Coord
+						CurrentMapSector = GridSetup->MapSector;
+						SectorCoord = GridSetup->SectorLocation;
+
+
+						bool SaveSuccess = SaveGameDataToFile(Directory + SectorCoord.ToString() + ".save",
+							ToBinary,
+							CurrentMapSector,
+							SectorCoord);
+
+						if (SaveSuccess)
+						{
+							SCREENMSG("Save Successful!");
+						}
+						else
+						{
+							SCREENMSGC("Save Successful!", Yellow);
+						}
+					}
+					else
+					{
+						// No Sector Found
+					}
+				}
+			}
 		}
-		else
-		{
-			SCREENMSGC("Save Successful!", Yellow);
-		}
+		
+		
+		
 	}
 	else
 	{
@@ -319,17 +349,11 @@ void AFactionsOfInadelPlayerController::MoveBack()
 
 bool AFactionsOfInadelPlayerController::SaveGameDataToFile(const FString& FullFilePath, FBufferArchive& ToBinary, FMapSector& MapSector, FVector& SectorCoord)
 {
-	//note that the supplied FString must be the entire Filepath
-		//  if writing it out yourself in C++ make sure to use the \\
-	    //  for example:
 
-		//  FString SavePath = "C:\\MyProject\\MySaveDir\\mysavefile.save";
+	//Step 1: Variable Data -> Binary
 
-		//Step 1: Variable Data -> Binary
-
-		//following along from above examples
+	//following along from above examples
 	
-
 	SaveLoadData(ToBinary, MapSector, SectorCoord);
 	//presumed to be global var data, 
 	//could pass in the data too if you preferred

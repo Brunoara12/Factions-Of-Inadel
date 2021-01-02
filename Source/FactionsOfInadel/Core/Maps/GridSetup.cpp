@@ -86,6 +86,26 @@ void AGridSetup::SpawnCell(FVector CellToSpawn)
 	}
 }
 
+void AGridSetup::PrintSector(FMapSector MapSector)
+{
+	// Display Sector
+	FString Col = "";
+	for (int32 z = 0; z < MapSector.Layers.Num(); z++)
+	{
+		V_LOG(" ");
+		for (int32 x = 0; x < MapSector.Layers[0].Rows.Num(); x++)
+		{
+			for (int32 y = 0; y < MapSector.Layers[0].Rows[0].Columns.Num(); y++)
+			{
+				Col.Append(FString::FromInt(MapSector.Layers[z].Rows[x].Columns[y]));
+
+			}
+			V_LOG(*Col);
+			Col.Empty();
+		}
+	}
+}
+
 // Called when the game starts or when spawned
 void AGridSetup::BeginPlay()
 {

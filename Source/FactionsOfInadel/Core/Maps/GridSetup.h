@@ -228,6 +228,9 @@ public:
 	// Spawn Cell into Map
 	void SpawnCell(FVector CellToSpawn);
 
+	// Log MapSector Visually
+	void PrintSector(FMapSector);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
