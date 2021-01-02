@@ -229,7 +229,7 @@ public:
 	void SpawnCell(FVector CellToSpawn);
 
 	// Log MapSector Visually
-	void PrintSector(FMapSector);
+	void PrintSector(FMapSector MapSector);
 
 protected:
 	// Called when the game starts or when spawned
